@@ -13,7 +13,16 @@
 
   function str(v) { return typeof v === 'string' ? v.slice(0, TEXT_MAX) : ''; }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function uid() { return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function uid(people) {
+    var max = 0;
+    Object.keys(people || {}).forEach(function (id) {
+      var m = /^p(\d+)(?:-|$)/.exec(id);
+      if (m && +m[1] > max) max = +m[1];
+    });
+    var r = '';
+    while (r.length < 3) r += Math.random().toString(36).slice(2);
+    return 'p' + (Math.max(max, Object.keys(people || {}).length) + 1) + '-' + r.slice(0, 3);
+  }
   function blank(id) {
     return { id: id, prenom: '', nom: '', profession: '',
       naissance: { date: '', lieu: '' }, mariage: { date: '', lieu: '' }, deces: { date: '', lieu: '' },
