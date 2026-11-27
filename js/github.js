@@ -73,7 +73,7 @@
   function tokenUrl(owner, mode, name) {
     return 'https://github.com/settings/personal-access-tokens/new?name=' + enc(name) +
       '&description=' + enc('Accès à un arbre Génialogie') + (owner ? '&target_name=' + enc(owner) : '') +
-      '&expires_in=366&contents=' + (mode === 'r' ? 'read' : 'write');
+      '&expires_in=365&contents=' + (mode === 'r' ? 'read' : 'write');
   }
   function expiryDays(exp) {
     if (!exp) return null;
