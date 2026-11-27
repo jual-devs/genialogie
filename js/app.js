@@ -692,9 +692,8 @@ function linkSet(kind, title, p) {
 }
 function renderSheet() {
   var body = $('#sheetBody');
-  if (!vw.focus || !P(vw.focus)) { $('#sid').textContent = ''; body.innerHTML = '<p class="none-text">Aucune fiche.' + (RO() ? '' : ' Ajoutez une personne depuis le registre.') + '</p>'; return; }
+  if (!vw.focus || !P(vw.focus)) { body.innerHTML = '<p class="none-text">Aucune fiche.' + (RO() ? '' : ' Ajoutez une personne depuis le registre.') + '</p>'; return; }
   var p = P(vw.focus);
-  $('#sid').textContent = 'n° ' + p.id.slice(0, 6);
   body.innerHTML = '<form id="f" autocomplete="off" onsubmit="return false"' + (RO() ? ' class="ro"' : '') + '>'
     + '<div class="row2">' + fld('prenom', 'Prénom', p.prenom) + fld('nom', 'Nom', p.nom) + '</div>'
     + fld('profession', 'Profession', p.profession)
@@ -733,7 +732,7 @@ function createAndLink(kind) {
   if (RO()) return;
   var inp = $('#new-' + kind), t = inp.value.trim();
   if (!t) { hint(kind, 'Saisissez un prénom et un nom.'); return; }
-  var parts = t.split(/\s+/), nom = parts.length > 1 ? parts.pop() : '', id = Data.uid(), n = Data.blank(id);
+  var parts = t.split(/\s+/), nom = parts.length > 1 ? parts.pop() : '', id = Data.uid(db), n = Data.blank(id);
   n.prenom = parts.join(' ').slice(0, 200); n.nom = nom.slice(0, 200); db[id] = n;
   var msg = link(kind, vw.focus, id);
   if (msg) { delete db[id]; hint(kind, msg); return; }
@@ -816,7 +815,7 @@ function setFocus(id, open) {
 }
 function newPerson() {
   if (RO()) return;
-  var id = Data.uid(); db[id] = Data.blank(id); vw.focus = id; save(); renderAll();
+  var id = Data.uid(db); db[id] = Data.blank(id); vw.focus = id; save(); renderAll();
   openSheet();
   var f = $('#f-prenom'); if (f) f.focus();
 }
