@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Génialogie</title>
+<meta name="description" content="Un arbre généalogique à construire à plusieurs, enregistré dans un dépôt GitHub privé.">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 72'%3E%3Cpath d='M48 24V36M24 36H72M24 36V46M72 36V46' fill='none' stroke='%23a6968c' stroke-width='4' stroke-linecap='round'/%3E%3Crect x='28' y='2' width='40' height='22' rx='5' fill='%23723d0e'/%3E%3Crect x='3' y='46' width='42' height='22' rx='5' fill='%23723d0e' fill-opacity='.55'/%3E%3Crect x='51' y='46' width='42' height='22' rx='5' fill='%23723d0e' fill-opacity='.55'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<noscript><p style="padding:24px">Génialogie a besoin de JavaScript pour fonctionner.</p></noscript>
+
+<!-- ============ Accueil ============ -->
+<section id="welcome" class="screen" hidden>
+  <div class="wrap">
+    <header class="brand">
+      <svg class="mark" viewBox="0 0 96 72" aria-hidden="true">
+        <path d="M48 24V36M24 36H72M24 36V46M72 36V46"/>
+        <rect class="top" x="28" y="3" width="40" height="21" rx="4"/>
+        <rect x="4" y="46" width="40" height="21" rx="4"/>
+        <rect x="52" y="46" width="40" height="21" rx="4"/>
+      </svg>
+      <div>
+        <h1>Génialogie</h1>
+        <p class="lead">Un arbre généalogique à construire à plusieurs, enregistré dans un dépôt GitHub privé.</p>
+      </div>
+    </header>
+
+    <div id="myTrees" class="mytrees" hidden>
+      <h2>Vos arbres sur cet appareil</h2>
+      <ul id="treeList"></ul>
+    </div>
+
+    <div class="choices">
+      <article class="choice">
+        <h2>Rejoindre un arbre</h2>
+        <p>Quelqu'un du groupe vous a transmis un code ou un lien ? Ouvrez l'arbre avec. Aucun compte GitHub n'est nécessaire.</p>
+        <button id="goJoin" type="button" class="btn primary">Rejoindre avec un code</button>
+      </article>
+      <article class="choice">
+        <h2>Créer un arbre</h2>
+        <p>Vous démarrez un nouvel arbre. Il sera enregistré dans un dépôt privé de votre compte GitHub, et vous inviterez le groupe avec un code.</p>
+        <button id="goCreate" type="button" class="btn">Créer un arbre</button>
+      </article>
+    </div>
+    <p class="fine">Aucun serveur de Génialogie ne reçoit vos données : cette page parle directement à GitHub depuis votre navigateur. Le code que vous saisissez reste sur cet appareil.</p>
+    <p><button id="backToApp" type="button" class="back" hidden>← Retour à l'arbre</button></p>
+  </div>
+</section>
+
+<!-- ============ Rejoindre ============ -->
+<section id="join" class="screen" hidden>
+  <div class="wrap narrow">
+    <button type="button" class="back" data-back>← Retour</button>
+    <h1 class="page">Rejoindre un arbre</h1>
+    <p class="lead">Collez le code de groupe, ou ouvrez le lien d'invitation qu'on vous a envoyé.</p>
+    <p></p>
+    <label for="joinName">Votre prénom (il apparaîtra dans l'historique des modifications)
+      <input id="joinName" maxlength="40" autocomplete="given-name"></label>
+    <label for="joinCode">Code du groupe
+      <textarea id="joinCode" rows="4" placeholder="GEN1-…" spellcheck="false" autocomplete="off"></textarea></label>
+    <p id="joinMsg" class="msg" role="status"></p>
+    <button id="joinGo" type="button" class="btn primary">Rejoindre l'arbre</button>
+  </div>
+</section>
+
+<!-- ============ Créer ============ -->
+<section id="create" class="screen" hidden>
+  <div class="wrap narrow">
+    <button type="button" class="back" data-back>← Retour</button>
+    <h1 class="page">Créer un arbre</h1>
+    <p class="lead">Il vous faut un compte GitHub. Trois étapes, environ cinq minutes.</p>
+    <p></p>
+    <label for="crName">Votre prénom (il apparaîtra dans l'historique des modifications)
+      <input id="crName" maxlength="40" autocomplete="given-name"></label>
+
+    <ol class="steps">
+      <li class="step" id="st1" data-state="open">
+        <h2>Créer le dépôt privé</h2>
+        <label for="crTree">Nom de l'arbre
+          <input id="crTree" maxlength="60" placeholder="Famille Dupont"></label>
+        <label for="crRepoName">Nom du dépôt GitHub
+          <input id="crRepoName" maxlength="80" spellcheck="false"></label>
+        <p class="help">GitHub s'ouvre dans un nouvel onglet avec le formulaire déjà rempli. Gardez « Private », cochez « Add a README file », puis cliquez sur « Create repository ».</p>
+        <a id="crOpenRepo" class="btn primary" target="_blank" rel="noopener noreferrer" href="https://github.com/new">Ouvrir GitHub</a>
+      </li>
+      <li class="step" id="st2" data-state="wait">
+        <h2>Créer un jeton d'accès</h2>
+        <label for="crRepoUrl">Adresse du dépôt créé
+          <input id="crRepoUrl" placeholder="https://github.com/votre-compte/genialogie-famille-dupont" spellcheck="false" autocomplete="off"></label>
+        <p class="help">Sur la page du jeton, dans « Repository access », choisissez « Only select repositories » puis ce dépôt. Cliquez sur « Generate token » et copiez le jeton (il commence par github_pat_).</p>
+        <a id="crOpenToken" class="btn primary" target="_blank" rel="noopener noreferrer" href="https://github.com/settings/personal-access-tokens/new">Ouvrir la création du jeton</a>
+      </li>
+      <li class="step" id="st3" data-state="wait">
+        <h2>Coller le jeton</h2>
+        <label for="crToken">Jeton
+          <input id="crToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label>
+        <p id="crMsg" class="msg" role="status"></p>
+        <button id="crGo" type="button" class="btn primary">Créer l'arbre</button>
+      </li>
+    </ol>
+    <p class="fine">Le jeton donne accès à ce seul dépôt. Il est gardé sur cet appareil et sert à fabriquer le code de groupe.</p>
+  </div>
+</section>
+
+<!-- ============ Application ============ -->
+<div id="app" data-view="tree" hidden>
+  <div class="head">
+    <header class="top">
+      <h1>Génialogie</h1>
+      <div class="menuwrap">
+        <button id="treeBtn" type="button" class="treebtn" aria-haspopup="true" aria-expanded="false"><span id="treeName"></span> ▾</button>
+        <div id="treeMenu" class="menu" hidden></div>
+      </div>
+      <span id="roBadge" class="badge" hidden>Lecture seule</span>
+      <span id="status" class="sub" role="status" aria-live="polite"></span>
+      <div class="top-actions">
+        <button id="shareBtn" type="button" class="btn">Partager</button>
+        <button id="refreshBtn" type="button" class="btn" title="Recharger l'arbre depuis GitHub">Actualiser</button>
+        <button id="themeBtn" type="button" class="btn" title="Changer de thème"></button>
+      </div>
+      <nav class="tabs" aria-label="Vue">
+        <button type="button" data-view="list" aria-pressed="false">Personnes</button>
+        <button type="button" data-view="tree" aria-pressed="true">Arbre</button>
+        <button type="button" data-view="sheet" aria-pressed="false">Fiche</button>
+      </nav>
+    </header>
+    <div id="banner" class="banner" role="status" hidden>
+      <span id="bannerText"></span>
+      <button id="bannerAct" type="button" class="btn" hidden></button>
+      <button id="bannerX" type="button" class="btn" aria-label="Fermer ce message">×</button>
+    </div>
+  </div>
+
+  <aside id="registry" class="panel" aria-label="Registre des personnes">
+    <div class="panel-head">
+      <div class="line"><h2>Registre</h2><span id="count" class="rd"></span></div>
+      <input id="q" type="search" placeholder="Rechercher un nom, un lieu, un métier" aria-label="Rechercher">
+      <button id="add" type="button" class="btn primary">Nouvelle personne</button>
+    </div>
+    <div class="scroll"><ul id="list"></ul></div>
+    <details class="data">
+      <summary>Données</summary>
+      <div class="data-body">
+        <p class="hint ok" style="margin:0">L'arbre est enregistré dans le fichier arbre.json du dépôt <a id="repoLink" href="#" target="_blank" rel="noopener noreferrer"></a>.</p>
+        <button id="exp" type="button" class="btn">Copier en JSON</button>
+        <div class="data-edit">
+          <textarea id="imp" rows="3" placeholder="Collez ici un export JSON pour remplacer tout l'arbre" aria-label="Import JSON"></textarea>
+          <button id="impgo" type="button" class="btn danger">Importer (remplace tout)</button>
+        </div>
+        <p id="dmsg" class="hint ok" role="status"></p>
+      </div>
+    </details>
+  </aside>
+
+  <main id="stage" aria-label="Arbre généalogique">
+    <svg id="svg" role="img" aria-label="Arbre généalogique autour de la personne centrale">
+      <g id="vp"><g id="links"></g><g id="cards"></g></g>
+    </svg>
+    <div class="bar">
+      <div class="group">
+        <button id="zin" type="button" class="btn" aria-label="Zoomer">+</button>
+        <button id="zout" type="button" class="btn" aria-label="Dézoomer">−</button>
+        <button id="ctr" type="button" class="btn">Recentrer</button>
+        <button id="fit" type="button" class="btn">Tout voir</button>
+      </div>
+      <div class="group">
+        <label for="anc">Ancêtres
+          <select id="anc"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+        </label>
+        <label for="desc">Descendants
+          <select id="desc"><option>1</option><option>2</option><option>3</option></select>
+        </label>
+      </div>
+      <div class="group panel-toggles" role="group" aria-label="Colonnes affichées">
+        <button id="tgList" type="button" class="btn" aria-pressed="true" title="Afficher ou masquer la liste des personnes">Liste</button>
+        <button id="tgSheet" type="button" class="btn" aria-pressed="false" title="Ouvrir ou fermer la fiche">Fiche</button>
+      </div>
+    </div>
+    <p class="hint-corner"><span class="mono">*</span> naissance &nbsp;<span class="mono">†</span> décès &nbsp;·&nbsp; glisser pour déplacer, molette ou pincement pour zoomer, clic pour recentrer, double-clic pour ouvrir la fiche</p>
+    <div id="empty" hidden>
+      <p id="emptyText">L'arbre est vide.</p>
+      <button id="addFirst" type="button" class="btn primary">Ajouter la première personne</button>
+      <button id="loadSeed" type="button" class="btn">Charger la famille d'exemple</button>
+    </div>
+  </main>
+
+  <section id="sheet" class="panel" aria-label="Fiche de la personne">
+    <div class="panel-head"><div class="line"><h2>Fiche</h2><span class="head-actions"><span id="sid" class="rd"></span><button id="closeSheet" type="button" class="btn" aria-label="Fermer la fiche" title="Fermer (Échap)">×</button></span></div></div>
+    <div class="scroll"><div id="sheetBody"></div></div>
+  </section>
+</div>
+
+<!-- ============ Partage ============ -->
+<div id="shareModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shareTitle" hidden>
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="shareTitle">Partager l'arbre</h2><button id="shareClose" type="button" class="btn" aria-label="Fermer">×</button></div>
+    <div id="shareBody"></div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/github.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
